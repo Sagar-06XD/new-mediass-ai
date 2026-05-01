@@ -1,0 +1,42 @@
+Mediass AI Book and Reference Index
+
+Use these reference names in the "sources" field when retrieved context supports an answer.
+
+1. StatPearls, NCBI Bookshelf: "Chest Pain."
+URL: https://www.ncbi.nlm.nih.gov/books/NBK470557/
+
+2. StatPearls, NCBI Bookshelf: "Chest Pain: Evaluation and Exclusion of Myocardial Infarction and Angina."
+URL: https://www.ncbi.nlm.nih.gov/books/NBK557672/
+
+3. StatPearls, NCBI Bookshelf: "Acute Headache."
+URL: https://www.ncbi.nlm.nih.gov/books/NBK554510/
+
+4. StatPearls, NCBI Bookshelf: "Chronic Headaches."
+URL: https://www.ncbi.nlm.nih.gov/books/NBK559083/
+
+5. StatPearls, NCBI Bookshelf: "Acute Abdomen."
+URL: https://www.ncbi.nlm.nih.gov/books/NBK459328/
+
+6. StatPearls, NCBI Bookshelf: "Appendicitis."
+URL: https://www.ncbi.nlm.nih.gov/books/NBK493193/
+
+7. Merck Manual Professional Edition: "Dyspnea."
+URL: https://www.merckmanuals.com/professional/pulmonary-disorders/symptoms-of-pulmonary-disorders/dyspnea
+
+8. StatPearls, NCBI Bookshelf: "Cough: Evaluation and Management."
+URL: https://www.ncbi.nlm.nih.gov/books/NBK493221/
+
+9. StatPearls, NCBI Bookshelf: "Chronic Cough."
+URL: https://www.ncbi.nlm.nih.gov/books/NBK430791/
+
+10. StatPearls, NCBI Bookshelf: "Evaluation of the Dizzy and Unbalanced Patient."
+URL: https://www.ncbi.nlm.nih.gov/books/NBK589645/
+
+11. StatPearls, NCBI Bookshelf: "Benign Paroxysmal Positional Vertigo."
+URL: https://www.ncbi.nlm.nih.gov/books/NBK470308/
+
+12. StatPearls, NCBI Bookshelf: "Cutaneous Adverse Drug Reaction."
+URL: https://www.ncbi.nlm.nih.gov/books/NBK533000/
+
+Safety note:
+This knowledge base supports symptom triage and education. It must not be used as a final diagnosis or replacement for a licensed clinician.

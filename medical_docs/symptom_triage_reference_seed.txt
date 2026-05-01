@@ -1,0 +1,123 @@
+Mediass AI Symptom Triage Reference Seed
+
+Purpose:
+This file is an educational triage knowledge seed for retrieval-augmented responses. It summarizes common symptom patterns, urgent warning signs, and safe next-step guidance. It does not diagnose, prescribe, or replace clinician evaluation.
+
+Reference policy:
+The notes below are original summaries derived from reputable clinical references. No copyrighted textbook passages are copied. When answering, cite the reference title listed for the matching section.
+
+General triage rules:
+- If symptoms suggest immediate danger, recommend emergency care first.
+- Red flags include severe chest pain, difficulty breathing, fainting, new neurologic weakness, confusion, severe allergic reaction, severe dehydration, uncontrolled bleeding, pregnancy with severe pain or bleeding, and sudden severe headache.
+- For uncertain or incomplete symptoms, recommend clinician evaluation and ask focused follow-up questions.
+- For mild symptoms without red flags, provide conservative self-care and monitoring advice while explaining when to seek care.
+
+Symptom: chest pain
+Key features to ask:
+- Location, quality, onset, duration, radiation, exertional trigger, shortness of breath, sweating, nausea, fainting, cough, fever, injury, reflux symptoms, and cardiac risk factors.
+Urgent warning signs:
+- Crushing or pressure-like chest pain, pain radiating to arm/jaw/back, shortness of breath, sweating, fainting, new confusion, low blood pressure symptoms, or chest pain with neurologic symptoms.
+Common possible categories:
+- Cardiac ischemia or angina, pulmonary embolism, pneumonia, reflux/esophageal causes, chest wall strain, anxiety or panic, pericarditis, aortic emergency.
+Safe recommendation:
+- Treat high-risk chest pain as emergency until evaluated. Suggest emergency services for severe, persistent, exertional, radiating, or breathlessness-associated pain.
+Reference:
+- StatPearls / NCBI Bookshelf: "Chest Pain" and "Chest Pain: Evaluation and Exclusion of Myocardial Infarction and Angina."
+- URL: https://www.ncbi.nlm.nih.gov/books/NBK470557/
+- URL: https://www.ncbi.nlm.nih.gov/books/NBK557672/
+
+Symptom: headache
+Key features to ask:
+- Suddenness, worst-ever severity, fever, neck stiffness, neurologic symptoms, trauma, pregnancy/postpartum status, age over 50 with new headache, cancer/immunosuppression, vision changes, pattern change, medication use.
+Urgent warning signs:
+- Thunderclap onset, focal weakness/numbness, confusion, seizure, fever with stiff neck, head injury, papilledema/vision loss, or new headache in pregnancy/postpartum.
+Common possible categories:
+- Tension-type headache, migraine, sinus/viral illness, dehydration, medication overuse, meningitis, intracranial bleeding, stroke-related headache, temporal arteritis in older adults.
+Safe recommendation:
+- Emergency evaluation for red flags. For stable recurrent headaches without red flags, advise hydration, rest, avoidance of known triggers, and clinician follow-up if new, worsening, frequent, or disabling.
+Reference:
+- StatPearls / NCBI Bookshelf: "Acute Headache" and "Chronic Headaches."
+- URL: https://www.ncbi.nlm.nih.gov/books/NBK554510/
+- URL: https://www.ncbi.nlm.nih.gov/books/NBK559083/
+
+Symptom: abdominal pain
+Key features to ask:
+- Location, migration, onset, duration, severity, vomiting, diarrhea, blood in stool, fever, urinary symptoms, pregnancy possibility, prior surgery, trauma, appetite loss, abdominal swelling.
+Urgent warning signs:
+- Severe or worsening pain, rigid abdomen, rebound tenderness, persistent vomiting, fainting, black/bloody stool, fever with severe pain, pregnancy with pain/bleeding, right lower quadrant pain with fever/vomiting, jaundice with fever.
+Common possible categories:
+- Gastroenteritis, constipation, reflux/gastritis, gallbladder disease, appendicitis, kidney stone or urinary infection, pancreatitis, bowel obstruction, gynecologic causes.
+Safe recommendation:
+- Severe, localized, worsening, or systemic abdominal pain needs urgent evaluation. Mild short-lived pain without red flags may be monitored with hydration and bland foods, but persistent pain needs medical review.
+Reference:
+- StatPearls / NCBI Bookshelf: "Acute Abdomen" and "Appendicitis."
+- URL: https://www.ncbi.nlm.nih.gov/books/NBK459328/
+- URL: https://www.ncbi.nlm.nih.gov/books/NBK493193/
+
+Symptom: shortness of breath / dyspnea
+Key features to ask:
+- Onset, exertional or resting symptoms, chest pain, cough, fever, wheeze, leg swelling, orthopnea, history of asthma/COPD/heart disease, anemia symptoms, recent travel/surgery, pregnancy.
+Urgent warning signs:
+- Severe breathlessness, blue lips, inability to speak full sentences, chest pain, fainting, confusion, oxygen saturation concern, sudden onset with leg swelling/pain, or allergic swelling.
+Common possible categories:
+- Asthma/COPD flare, pneumonia, heart failure, pulmonary embolism, anemia, anxiety/panic, allergic reaction.
+Safe recommendation:
+- Sudden, severe, or chest-pain-associated dyspnea is urgent. Stable mild dyspnea still needs clinician assessment if new, recurrent, worsening, or associated with fever/cough/leg swelling.
+Reference:
+- Merck Manual Professional Edition: "Dyspnea."
+- URL: https://www.merckmanuals.com/professional/pulmonary-disorders/symptoms-of-pulmonary-disorders/dyspnea
+
+Symptom: cough
+Key features to ask:
+- Duration, fever, sputum, blood, chest pain, shortness of breath, wheeze, smoking/vaping, asthma/COPD, reflux/postnasal drip, exposure, weight loss/night sweats.
+Urgent warning signs:
+- Coughing blood, severe breathlessness, chest pain, high fever with worsening condition, confusion, dehydration, or risk factors for pulmonary embolism.
+Common possible categories:
+- Viral upper respiratory infection, bronchitis, pneumonia, asthma, COPD, postnasal drip, reflux, medication effect, tuberculosis or malignancy in selected contexts.
+Safe recommendation:
+- Emergency/urgent care for red flags. Persistent cough beyond several weeks, recurrent fever, blood, weight loss, or risk factors needs clinician evaluation.
+Reference:
+- StatPearls / NCBI Bookshelf: "Cough: Evaluation and Management" and "Chronic Cough."
+- URL: https://www.ncbi.nlm.nih.gov/books/NBK493221/
+- URL: https://www.ncbi.nlm.nih.gov/books/NBK430791/
+
+Symptom: dizziness / vertigo / imbalance
+Key features to ask:
+- Spinning versus lightheadedness, fainting, hearing loss/tinnitus, headache, neurologic symptoms, chest pain, palpitations, dehydration, medications, duration, positional trigger.
+Urgent warning signs:
+- New weakness/numbness, slurred speech, double vision, severe headache, inability to walk, chest pain, fainting, or persistent vomiting/dehydration.
+Common possible categories:
+- Benign positional vertigo, vestibular neuritis, migraine-associated vertigo, dehydration, medication effect, low blood pressure, arrhythmia, stroke/posterior circulation problem.
+Safe recommendation:
+- Dizziness with neurologic or cardiac symptoms is urgent. Positional brief vertigo without red flags can be outpatient, but persistent or recurrent symptoms need evaluation.
+Reference:
+- StatPearls / NCBI Bookshelf: "Evaluation of the Dizzy and Unbalanced Patient" and "Benign Paroxysmal Positional Vertigo."
+- URL: https://www.ncbi.nlm.nih.gov/books/NBK589645/
+- URL: https://www.ncbi.nlm.nih.gov/books/NBK470308/
+
+Symptom: fever
+Key features to ask:
+- Temperature, duration, chills, cough, urinary symptoms, rash, neck stiffness, abdominal pain, travel, immune compromise, pregnancy, recent surgery, medications.
+Urgent warning signs:
+- Fever with confusion, stiff neck, severe headache, trouble breathing, persistent vomiting, dehydration, purple/nonblanching rash, immune compromise, very young infant, or severe worsening.
+Common possible categories:
+- Viral illness, bacterial infection, pneumonia, urinary infection, gastrointestinal infection, drug reaction, inflammatory illness.
+Safe recommendation:
+- Fever with red flags needs urgent care. Persistent fever, recurrent fever, or fever in high-risk patients needs clinician evaluation.
+Reference:
+- StatPearls / NCBI Bookshelf: fever-related emergency and infectious disease evaluation topics.
+- URL: https://www.ncbi.nlm.nih.gov/books/NBK570583/
+
+Symptom: rash and visible skin changes
+Key features to ask:
+- Onset, itch/pain, fever, medication exposure, mucous membrane involvement, spread, blisters, facial/lip swelling, breathing symptoms, tick/insect exposure, immune status.
+Urgent warning signs:
+- Rash with trouble breathing, facial/tongue swelling, high fever, skin pain, blisters, peeling, purple/nonblanching spots, mucous membrane erosions, rapid spread, or severe illness.
+Common possible categories:
+- Viral rash, allergy/urticaria, eczema/dermatitis, cellulitis, drug eruption, shingles, serious blistering drug reaction in selected contexts.
+Safe recommendation:
+- Emergency care for allergic airway symptoms or severe systemic rash. New medication-associated rash with fever, mucosal lesions, pain, or peeling is urgent.
+Reference:
+- StatPearls / NCBI Bookshelf: "Cutaneous Adverse Drug Reaction" and dermatology rash references.
+- URL: https://www.ncbi.nlm.nih.gov/books/NBK533000/
+
