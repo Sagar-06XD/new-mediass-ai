@@ -11,7 +11,7 @@ const { detectIntent } = require('../services/intentService');
 
 const normalizeSex = (text) => {
   const lower = text.toLowerCase();
-  if (/\b(male|man|boy|m)\b/.test(lower)) return 'male';
+  if (/\b(male|mawl|mle|man|boy|m)\b/.test(lower)) return 'male';
   if (/\b(female|woman|girl|f)\b/.test(lower)) return 'female';
   if (/\b(other|nonbinary|non-binary|transgender|prefer not)\b/.test(lower)) return 'other';
   return '';
