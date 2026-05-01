@@ -5,7 +5,7 @@ import ChatWindow from './components/ChatWindow';
 import InsightsPanel from './components/InsightsPanel';
 import EmergencyAlert from './components/EmergencyAlert';
 import TrainingPage from './components/TrainingPage';
-import { checkHealthAPI, queryModelAPI, uploadFileAPI } from './services/api';
+import { checkHealthAPI, queryModelAPI, resetChatSession, uploadFileAPI } from './services/api';
 
 // Mock structured AI responses
 const MOCK_RESPONSES = [
@@ -167,6 +167,7 @@ export default function App() {
   };
 
   const handleNewConsultation = () => {
+    resetChatSession();
     setMessages([{
       id: Date.now(),
       role: 'ai',

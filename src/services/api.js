@@ -1,5 +1,14 @@
 import axios from 'axios';
 
+const createSessionId = () => {
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+    return `session_${crypto.randomUUID()}`;
+  }
+  return `session_${Date.now()}_${Math.random().toString(36).substring(2)}`;
+};
+
+let activeSessionId = createSessionId();
+
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001',
   timeout: 30000,
@@ -7,6 +16,11 @@ const api = axios.create({
     'Content-Type': 'application/json',
   },
 });
+
+export const resetChatSession = () => {
+  activeSessionId = createSessionId();
+  return activeSessionId;
+};
 
 export const uploadFileAPI = async (file) => {
   const formData = new FormData();
@@ -31,7 +45,7 @@ export const queryModelAPI = async (question) => {
   const response = await api.post('/api/chat', {
     message: question,
     userId: 'demo-user',
-    sessionId: 'session_' + Math.random().toString(36).substring(7)
+    sessionId: activeSessionId
   });
   return response.data;
 };
