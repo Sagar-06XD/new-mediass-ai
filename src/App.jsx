@@ -95,6 +95,7 @@ export default function App() {
   const [messages, setMessages] = useState([makeDefaultGreeting()]);
   const [inputText, setInputText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [processStatus, setProcessStatus] = useState('');
   const [insights, setInsights] = useState(null);
   const [isEmergency, setIsEmergency] = useState(false);
   const [isTrained, setIsTrained] = useState(false);
@@ -187,80 +188,98 @@ export default function App() {
     setMessages(prev => [...prev, userMsg]);
     setInputText('');
     setIsLoading(true);
+    setProcessStatus('Analyzing symptoms...');
 
-    setTimeout(async () => {
-      try {
-        let aiMsg;
+    // Dynamic process status sequence
+    const statusSequence = [
+      { text: 'Analyzing symptoms...', delay: 0 },
+      { text: 'Consulting local medical database...', delay: 1500 },
+      { text: 'Searching for nearby specialists...', delay: 3000 },
+      { text: 'Generating diagnostic report...', delay: 4500 }
+    ];
 
-        if (!user) {
-          const mockData = MOCK_RESPONSES[mockIndex % MOCK_RESPONSES.length];
-          setMockIndex(i => i + 1);
-          aiMsg = {
-            id: Date.now() + 1,
-            role: 'ai',
-            structured: mockData,
-            timestamp: new Date(),
-          };
-          setInsights(mockData);
-          setIsEmergency(mockData.isEmergency);
-        } else {
-          // ── Real backend path ──────────────────────────────────────────────
-          try {
-            const data = await queryModelAPI(query);
-            const intent = data.intent || 'medical';
+    statusSequence.forEach(item => {
+      setTimeout(() => {
+        setIsLoading(currentLoading => {
+          if (currentLoading) setProcessStatus(item.text);
+          return currentLoading;
+        });
+      }, item.delay);
+    });
 
-            if (intent === 'greeting' || intent === 'general' || intent === 'followup') {
-              aiMsg = {
-                id: Date.now() + 1,
-                role: 'ai',
-                text: data.text,
-                timestamp: new Date(),
-              };
-            } else {
-              const responseData = {
-                understanding: data.understanding || data.text || data.answer,
-                causes: data.causes || [],
-                riskLevel: (data.risk || data.urgency || 'low').toLowerCase(),
-                recommendations: data.recommendations || [],
-                specialist: data.doctor || 'General Physician',
-                doctors: data.doctors || [],
-                confidence: Math.round((data.confidence ?? (data.type === 'chat' ? 0.75 : 0.85)) * 100),
-                isEmergency: data.emergency || false,
-                sources: data.sources || [],
-                symptoms: data.symptoms || [],
-                updated: data.updated || false,
-              };
-              aiMsg = {
-                id: Date.now() + 1,
-                role: 'ai',
-                structured: responseData,
-                text: data.text,
-                timestamp: new Date(),
-              };
-              setInsights(responseData);
-              setIsEmergency(responseData.isEmergency);
-            }
-          } catch (error) {
-            console.error('Chat API Error:', error);
-            const status = error.response?.status;
-            const errorMsg = error.response?.data?.error || error.message;
-            
+    try {
+      let aiMsg;
+
+      if (!user) {
+        // Mock delay
+        await new Promise(r => setTimeout(r, 2000));
+        const mockData = MOCK_RESPONSES[mockIndex % MOCK_RESPONSES.length];
+        setMockIndex(i => i + 1);
+        aiMsg = {
+          id: Date.now() + 1,
+          role: 'ai',
+          structured: mockData,
+          timestamp: new Date(),
+        };
+        setInsights(mockData);
+        setIsEmergency(mockData.isEmergency);
+      } else {
+        try {
+          const data = await queryModelAPI(query);
+          const intent = data.intent || 'medical';
+
+          if (intent === 'greeting' || intent === 'general' || intent === 'followup') {
             aiMsg = {
               id: Date.now() + 1,
               role: 'ai',
-              text: status === 401 
-                ? 'Your session has expired. Please log out and log back in.' 
-                : `Backend Error: ${errorMsg}. Please ensure the server is running on port 5001.`,
+              text: data.text,
               timestamp: new Date(),
             };
+          } else {
+            const responseData = {
+              understanding: data.understanding || data.text || data.answer,
+              causes: data.causes || [],
+              riskLevel: (data.risk || data.urgency || 'low').toLowerCase(),
+              recommendations: data.recommendations || [],
+              specialist: data.doctor || 'General Physician',
+              doctors: data.doctors || [],
+              confidence: Math.round((data.confidence ?? (data.type === 'chat' ? 0.75 : 0.85)) * 100),
+              isEmergency: data.emergency || false,
+              sources: data.sources || [],
+              symptoms: data.symptoms || [],
+              updated: data.updated || false,
+            };
+            aiMsg = {
+              id: Date.now() + 1,
+              role: 'ai',
+              structured: responseData,
+              text: data.text,
+              timestamp: new Date(),
+            };
+            setInsights(responseData);
+            setIsEmergency(responseData.isEmergency);
           }
+        } catch (error) {
+          console.error('Chat API Error:', error);
+          const status = error.response?.status;
+          const errorMsg = error.response?.data?.error || error.message;
+          
+          aiMsg = {
+            id: Date.now() + 1,
+            role: 'ai',
+            text: status === 401 
+              ? 'Your session has expired. Please log out and log back in.' 
+              : `Backend Error: ${errorMsg}. Please ensure the server is running on port 5001.`,
+            timestamp: new Date(),
+          };
         }
-
-        setMessages(prev => [...prev, aiMsg]);
-      } finally {
-        setIsLoading(false);
       }
-    }, 800);
+
+      setMessages(prev => [...prev, aiMsg]);
+    } finally {
+      setIsLoading(false);
+      setProcessStatus('');
+    }
   };
 
   const handleNewConsultation = () => {
@@ -350,7 +369,13 @@ export default function App() {
   }
 
   return (
-    <div className={`h-screen flex flex-col overflow-hidden transition-colors duration-300 ${darkMode ? 'bg-slate-900 text-slate-100' : 'bg-gray-50 text-gray-900'}`}>
+    <div className={`h-screen flex flex-col overflow-hidden transition-colors duration-300 ${darkMode ? 'bg-[#0a0f1d] text-slate-100' : 'bg-gray-50 text-gray-900'}`}>
+      {/* Background Mesh Gradient */}
+      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+        <div className={`absolute top-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full blur-[120px] opacity-[0.07] ${darkMode ? 'bg-blue-500' : 'bg-blue-300'}`} />
+        <div className={`absolute bottom-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full blur-[100px] opacity-[0.05] ${darkMode ? 'bg-purple-500' : 'bg-purple-300'}`} />
+      </div>
+
       {/* Emergency Alert */}
       <AnimatePresence>
         {isEmergency && (
@@ -359,7 +384,7 @@ export default function App() {
       </AnimatePresence>
 
       {/* Main Layout */}
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 overflow-hidden relative z-10">
         {/* Sidebar */}
         <AnimatePresence>
           {sidebarOpen && (
@@ -394,20 +419,43 @@ export default function App() {
         ) : (
           <>
             {/* Chat Window */}
-            <ChatWindow
-              messages={messages}
-              isLoading={isLoading}
-              inputText={inputText}
-              setInputText={setInputText}
-              onSend={handleSend}
-              onFileUpload={handleFileUpload}
-              darkMode={darkMode}
-              onToggleDark={() => setDarkMode(d => !d)}
-              onToggleSidebar={() => setSidebarOpen(s => !s)}
-              onToggleInsights={() => setInsightsPanelOpen(p => !p)}
-              sidebarOpen={sidebarOpen}
-              isTrained={isTrained}
-            />
+            <div className="flex-1 flex flex-col min-w-0">
+               {/* Process Indicator Bar */}
+               <AnimatePresence>
+                {isLoading && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    className={`px-6 py-2 flex items-center justify-center gap-3 border-b overflow-hidden ${darkMode ? 'bg-blue-900/10 border-blue-900/30' : 'bg-blue-50 border-blue-100'}`}
+                  >
+                    <motion.div
+                      animate={{ rotate: 360 }}
+                      transition={{ repeat: Infinity, duration: 2, ease: "linear" }}
+                      className="w-4 h-4 rounded-full border-2 border-blue-500 border-t-transparent"
+                    />
+                    <span className={`text-xs font-bold tracking-wide uppercase ${darkMode ? 'text-blue-400' : 'text-blue-600'}`}>
+                      {processStatus}
+                    </span>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              <ChatWindow
+                messages={messages}
+                isLoading={isLoading}
+                inputText={inputText}
+                setInputText={setInputText}
+                onSend={handleSend}
+                onFileUpload={handleFileUpload}
+                darkMode={darkMode}
+                onToggleDark={() => setDarkMode(d => !d)}
+                onToggleSidebar={() => setSidebarOpen(s => !s)}
+                onToggleInsights={() => setInsightsPanelOpen(p => !p)}
+                sidebarOpen={sidebarOpen}
+                isTrained={isTrained}
+              />
+            </div>
 
             {/* Insights Panel */}
             <AnimatePresence>

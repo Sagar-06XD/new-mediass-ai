@@ -47,79 +47,106 @@ function StructuredMessage({ structured, darkMode }) {
 
   return (
     <div className={`rounded-2xl rounded-tl-sm border ${bg} shadow-sm overflow-hidden max-w-2xl`}>
-      <div className="p-4 space-y-0">
+      <motion.div 
+        initial="hidden"
+        animate="visible"
+        variants={{
+          hidden: { opacity: 0 },
+          visible: {
+            opacity: 1,
+            transition: {
+              staggerChildren: 0.1
+            }
+          }
+        }}
+        className="p-4 space-y-0"
+      >
         {/* Understanding */}
-        <Section icon={<Brain size={14} />} title="AI Understanding" darkMode={darkMode} accent="text-blue-500">
-          <p className={`text-sm leading-relaxed ${text}`}>{safeStr(structured.understanding)}</p>
-        </Section>
+        <motion.div variants={{ hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0 } }}>
+          <Section icon={<Brain size={14} />} title="AI Understanding" darkMode={darkMode} accent="text-blue-500">
+            <p className={`text-sm leading-relaxed ${text}`}>{safeStr(structured.understanding)}</p>
+          </Section>
+        </motion.div>
 
         {/* Symptoms */}
         {(structured.symptoms || []).length > 0 && (
-          <Section icon={<Tag size={14} />} title="Symptoms" darkMode={darkMode} accent="text-blue-500">
-            <ul className="space-y-1">
-              {structured.symptoms.map((s, i) => (
-                <li key={i} className={`text-sm flex items-start gap-2 ${listItem}`}>
-                  <span className="text-blue-400 mt-1.5 flex-shrink-0">•</span>
-                  {safeStr(s)}
-                </li>
-              ))}
-            </ul>
-          </Section>
+          <motion.div variants={{ hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0 } }}>
+            <Section icon={<Tag size={14} />} title="Symptoms" darkMode={darkMode} accent="text-blue-500">
+              <ul className="space-y-1">
+                {structured.symptoms.map((s, i) => (
+                  <li key={i} className={`text-sm flex items-start gap-2 ${listItem}`}>
+                    <span className="text-blue-400 mt-1.5 flex-shrink-0">•</span>
+                    {safeStr(s)}
+                  </li>
+                ))}
+              </ul>
+            </Section>
+          </motion.div>
         )}
 
         {/* Possible Causes */}
-        <Section icon={<Search size={14} />} title="Possible Causes" darkMode={darkMode} accent="text-purple-500">
-          <ul className="space-y-1">
-            {(structured.causes || []).map((c, i) => (
-              <li key={i} className={`text-sm flex items-start gap-2 ${listItem}`}>
-                <span className="text-purple-400 mt-1.5 flex-shrink-0">•</span>
-                {safeStr(c)}
-              </li>
-            ))}
-          </ul>
-        </Section>
-
-        {/* Risk Level */}
-        <Section icon={<AlertTriangle size={14} />} title="Risk Assessment" darkMode={darkMode} accent="text-amber-500">
-          <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border ${riskCfg.bg} ${riskCfg.color}`}>
-            {riskCfg.icon}
-            {riskCfg.label}
-          </span>
-        </Section>
-
-        {/* Recommendations */}
-        <Section icon={<Lightbulb size={14} />} title="Recommendations" darkMode={darkMode} accent="text-green-500">
-          <ul className="space-y-1.5">
-            {(structured.recommendations || []).map((r, i) => (
-              <li key={i} className={`text-sm flex items-start gap-2 ${listItem}`}>
-                <CheckCircle size={13} className="text-green-500 mt-0.5 flex-shrink-0" />
-                {safeStr(r)}
-              </li>
-            ))}
-          </ul>
-        </Section>
-
-        {/* Doctor Suggestion */}
-        <Section icon={<Stethoscope size={14} />} title="Suggested Specialist" darkMode={darkMode} accent="text-teal-500">
-          <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-sm font-medium ${darkMode ? 'bg-teal-900/30 text-teal-300 border border-teal-800/50' : 'bg-teal-50 text-teal-700 border border-teal-200'}`}>
-            <Stethoscope size={14} />
-            {safeStr(structured.doctorSuggestion || structured.specialist)}
-          </div>
-        </Section>
-
-        {structured.sources?.length > 0 && (
-          <Section icon={<BookOpen size={14} />} title="References" darkMode={darkMode} accent="text-indigo-500">
-            <ul className="space-y-1.5">
-              {structured.sources.map((source, i) => (
-                <li key={i} className={`text-xs leading-relaxed flex items-start gap-2 ${subtext}`}>
-                  <BookOpen size={12} className="text-indigo-500 mt-0.5 flex-shrink-0" />
-                  <span>{source}</span>
+        <motion.div variants={{ hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0 } }}>
+          <Section icon={<Search size={14} />} title="Possible Causes" darkMode={darkMode} accent="text-purple-500">
+            <ul className="space-y-1">
+              {(structured.causes || []).map((c, i) => (
+                <li key={i} className={`text-sm flex items-start gap-2 ${listItem}`}>
+                  <span className="text-purple-400 mt-1.5 flex-shrink-0">•</span>
+                  {safeStr(c)}
                 </li>
               ))}
             </ul>
           </Section>
+        </motion.div>
+
+        {/* Risk Level */}
+        <motion.div variants={{ hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0 } }}>
+          <Section icon={<AlertTriangle size={14} />} title="Risk Assessment" darkMode={darkMode} accent="text-amber-500">
+            <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border ${riskCfg.bg} ${riskCfg.color}`}>
+              {riskCfg.icon}
+              {riskCfg.label}
+            </span>
+          </Section>
+        </motion.div>
+
+        {/* Recommendations */}
+        <motion.div variants={{ hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0 } }}>
+          <Section icon={<Lightbulb size={14} />} title="Recommendations" darkMode={darkMode} accent="text-green-500">
+            <ul className="space-y-1.5">
+              {(structured.recommendations || []).map((r, i) => (
+                <li key={i} className={`text-sm flex items-start gap-2 ${listItem}`}>
+                  <CheckCircle size={13} className="text-green-500 mt-0.5 flex-shrink-0" />
+                  {safeStr(r)}
+                </li>
+              ))}
+            </ul>
+          </Section>
+        </motion.div>
+
+        {/* Doctor Suggestion */}
+        <motion.div variants={{ hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0 } }}>
+          <Section icon={<Stethoscope size={14} />} title="Suggested Specialist" darkMode={darkMode} accent="text-teal-500">
+            <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-sm font-medium ${darkMode ? 'bg-teal-900/30 text-teal-300 border border-teal-800/50' : 'bg-teal-50 text-teal-700 border border-teal-200'}`}>
+              <Stethoscope size={14} />
+              {safeStr(structured.doctorSuggestion || structured.specialist)}
+            </div>
+          </Section>
+        </motion.div>
+
+        {structured.sources?.length > 0 && (
+          <motion.div variants={{ hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0 } }}>
+            <Section icon={<BookOpen size={14} />} title="References" darkMode={darkMode} accent="text-indigo-500">
+              <ul className="space-y-1.5">
+                {structured.sources.map((source, i) => (
+                  <li key={i} className={`text-xs leading-relaxed flex items-start gap-2 ${subtext}`}>
+                    <BookOpen size={12} className="text-indigo-500 mt-0.5 flex-shrink-0" />
+                    <span>{source}</span>
+                  </li>
+                ))}
+              </ul>
+            </Section>
+          </motion.div>
         )}
-      </div>
+      </motion.div>
 
       {/* Expandable Reasoning */}
       <div className={`border-t ${darkMode ? 'border-slate-700' : 'border-gray-100'}`}>
@@ -203,15 +230,21 @@ export default function MessageBubble({ message, darkMode, onSend }) {
   if (isUser) {
     return (
       <motion.div
-        initial={{ opacity: 0, y: 12, x: 12 }}
-        animate={{ opacity: 1, y: 0, x: 0 }}
-        transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+        initial={{ opacity: 0, y: 20, scale: 0.95 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ 
+          type: 'spring', 
+          stiffness: 400, 
+          damping: 30,
+          delay: 0.1 
+        }}
+        whileHover={{ scale: 1.01 }}
         className="flex gap-3 items-end flex-row-reverse"
       >
-        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center flex-shrink-0">
-          <User size={15} className="text-white" />
+        <div className="w-9 h-9 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center flex-shrink-0 shadow-lg shadow-blue-500/20">
+          <User size={16} className="text-white" />
         </div>
-        <div className="bg-blue-600 text-white px-4 py-3 rounded-2xl rounded-br-sm shadow-sm max-w-md">
+        <div className="bg-blue-600 text-white px-5 py-3.5 rounded-2xl rounded-br-sm shadow-xl shadow-blue-900/10 max-w-md border border-white/10">
           <p className="text-sm leading-relaxed">{message.text}</p>
         </div>
       </motion.div>
