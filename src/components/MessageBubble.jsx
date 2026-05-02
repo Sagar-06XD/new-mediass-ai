@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Brain, Search, AlertTriangle, Lightbulb, Stethoscope,
   ThumbsUp, ThumbsDown, ChevronDown, ChevronUp, User, AlertCircle,
-  CheckCircle, BookOpen
+  CheckCircle, BookOpen, Tag
 } from 'lucide-react';
 
 const RISK_CONFIG = {
@@ -25,6 +25,16 @@ function Section({ icon, title, children, darkMode, accent }) {
   );
 }
 
+const safeStr = (val) => {
+  if (!val) return '';
+  if (typeof val === 'string') return val;
+  try {
+    return JSON.stringify(val);
+  } catch {
+    return String(val);
+  }
+};
+
 function StructuredMessage({ structured, darkMode }) {
   const [showReasoning, setShowReasoning] = useState(false);
   const [feedback, setFeedback] = useState(null);
@@ -40,16 +50,30 @@ function StructuredMessage({ structured, darkMode }) {
       <div className="p-4 space-y-0">
         {/* Understanding */}
         <Section icon={<Brain size={14} />} title="AI Understanding" darkMode={darkMode} accent="text-blue-500">
-          <p className={`text-sm leading-relaxed ${text}`}>{structured.understanding}</p>
+          <p className={`text-sm leading-relaxed ${text}`}>{safeStr(structured.understanding)}</p>
         </Section>
+
+        {/* Symptoms */}
+        {(structured.symptoms || []).length > 0 && (
+          <Section icon={<Tag size={14} />} title="Symptoms" darkMode={darkMode} accent="text-blue-500">
+            <ul className="space-y-1">
+              {structured.symptoms.map((s, i) => (
+                <li key={i} className={`text-sm flex items-start gap-2 ${listItem}`}>
+                  <span className="text-blue-400 mt-1.5 flex-shrink-0">•</span>
+                  {safeStr(s)}
+                </li>
+              ))}
+            </ul>
+          </Section>
+        )}
 
         {/* Possible Causes */}
         <Section icon={<Search size={14} />} title="Possible Causes" darkMode={darkMode} accent="text-purple-500">
           <ul className="space-y-1">
-            {structured.causes.map((c, i) => (
+            {(structured.causes || []).map((c, i) => (
               <li key={i} className={`text-sm flex items-start gap-2 ${listItem}`}>
                 <span className="text-purple-400 mt-1.5 flex-shrink-0">•</span>
-                {c}
+                {safeStr(c)}
               </li>
             ))}
           </ul>
@@ -66,10 +90,10 @@ function StructuredMessage({ structured, darkMode }) {
         {/* Recommendations */}
         <Section icon={<Lightbulb size={14} />} title="Recommendations" darkMode={darkMode} accent="text-green-500">
           <ul className="space-y-1.5">
-            {structured.recommendations.map((r, i) => (
+            {(structured.recommendations || []).map((r, i) => (
               <li key={i} className={`text-sm flex items-start gap-2 ${listItem}`}>
                 <CheckCircle size={13} className="text-green-500 mt-0.5 flex-shrink-0" />
-                {r}
+                {safeStr(r)}
               </li>
             ))}
           </ul>
@@ -79,7 +103,7 @@ function StructuredMessage({ structured, darkMode }) {
         <Section icon={<Stethoscope size={14} />} title="Suggested Specialist" darkMode={darkMode} accent="text-teal-500">
           <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-sm font-medium ${darkMode ? 'bg-teal-900/30 text-teal-300 border border-teal-800/50' : 'bg-teal-50 text-teal-700 border border-teal-200'}`}>
             <Stethoscope size={14} />
-            {structured.doctorSuggestion}
+            {safeStr(structured.doctorSuggestion || structured.specialist)}
           </div>
         </Section>
 
@@ -157,7 +181,7 @@ function StructuredMessage({ structured, darkMode }) {
   );
 }
 
-export default function MessageBubble({ message, darkMode }) {
+export default function MessageBubble({ message, darkMode, onSend }) {
   const isUser = message.role === 'user';
   const isSystem = message.role === 'system';
   const isAI = message.role === 'ai';
@@ -209,8 +233,23 @@ export default function MessageBubble({ message, darkMode }) {
       {message.structured ? (
         <StructuredMessage structured={message.structured} darkMode={darkMode} />
       ) : (
-        <div className={`px-4 py-3 rounded-2xl rounded-tl-sm border shadow-sm max-w-lg ${darkMode ? 'bg-slate-800 border-slate-700 text-slate-100' : 'bg-white border-gray-200 text-gray-800'}`}>
-          <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.text}</p>
+        <div className="flex flex-col gap-2 max-w-lg">
+          <div className={`px-4 py-3 rounded-2xl rounded-tl-sm border shadow-sm w-full ${darkMode ? 'bg-slate-800 border-slate-700 text-slate-100' : 'bg-white border-gray-200 text-gray-800'}`}>
+            <p className="text-sm leading-relaxed whitespace-pre-wrap">{safeStr(message.text)}</p>
+          </div>
+          {message.options && message.options.length > 0 && (
+            <div className="flex flex-wrap gap-2 mt-1">
+              {message.options.map((opt) => (
+                <button
+                  key={opt}
+                  onClick={() => onSend(opt)}
+                  className={`px-3 py-1.5 rounded-lg text-sm font-medium border transition-colors ${darkMode ? 'border-blue-500/30 text-blue-400 hover:bg-blue-500/10' : 'border-blue-200 text-blue-600 hover:bg-blue-50'}`}
+                >
+                  {opt}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       )}
     </motion.div>

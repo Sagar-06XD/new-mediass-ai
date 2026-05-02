@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Upload, FileText, File, Loader2, CheckCircle, AlertCircle, Server } from 'lucide-react';
-import { trainModelAPI, trainTextAPI, uploadFileAPI } from '../services/api';
+import { trainTextAPI, uploadFileAPI } from '../services/api';
 
 export default function TrainingPage() {
   const [files, setFiles] = useState([]);
@@ -24,15 +24,13 @@ export default function TrainingPage() {
     setStatusMessage({ type: 'info', text: 'Uploading files...' });
 
     try {
+      let chunks = 0;
       for (const file of files) {
-        await uploadFileAPI(file);
+        const response = await uploadFileAPI(file);
+        chunks += response.chunks || 0;
       }
 
-      setStatusMessage({ type: 'info', text: 'Training in progress...' });
-
-      const response = await trainModelAPI();
-
-      setStatusMessage({ type: 'success', text: `Training completed ✅ (${response.chunks || 0} chunks processed)` });
+      setStatusMessage({ type: 'success', text: `Training completed ✅ (${chunks} chunks processed)` });
       setFiles([]);
     } catch (error) {
       setStatusMessage({ 
@@ -51,14 +49,27 @@ export default function TrainingPage() {
     }
 
     setLoading(true);
-    setStatusMessage({ type: 'info', text: 'Training in progress...' });
+    setStatusMessage({ type: 'info', text: 'Training in progress... This may take a minute for large texts.' });
+
+    // Show elapsed time so user knows it's not stuck
+    const startTime = Date.now();
+    const timer = setInterval(() => {
+      const elapsed = Math.round((Date.now() - startTime) / 1000);
+      setStatusMessage({ type: 'info', text: `Training in progress... (${elapsed}s elapsed)` });
+    }, 1000);
 
     try {
       const response = await trainTextAPI(textInput);
+      clearInterval(timer);
       
-      setStatusMessage({ type: 'success', text: `Training completed ✅ (${response.chunks || 0} chunks processed)` });
+      const elapsed = Math.round((Date.now() - startTime) / 1000);
+      setStatusMessage({ 
+        type: 'success', 
+        text: response.message || `Training completed ✅ (${response.chunks || 0} chunks processed in ${elapsed}s)` 
+      });
       setTextInput('');
     } catch (error) {
+      clearInterval(timer);
       setStatusMessage({ 
         type: 'error', 
         text: error.response?.data?.error || error.message || 'Failed to train from text. Please try again.' 
@@ -76,7 +87,7 @@ export default function TrainingPage() {
         <div className="text-center">
           <Server className="mx-auto h-12 w-12 text-blue-500 mb-4" />
           <h1 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
-            MediAssist AI Training
+            MeAssist AI Training
           </h1>
           <p className="mt-3 text-lg text-slate-400">
             Upload medical documents or paste raw text to train the AI knowledge base.
@@ -110,14 +121,14 @@ export default function TrainingPage() {
                 <input 
                   type="file" 
                   multiple 
-                  accept=".txt,.pdf" 
+                  accept=".txt,.pdf,.xlsx,.xls,.csv" 
                   onChange={handleFileChange}
                   disabled={loading}
                   className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
                 />
                 <File className="mx-auto h-10 w-10 text-slate-500 mb-3" />
                 <p className="text-sm font-medium text-slate-300">Click to upload or drag and drop</p>
-                <p className="text-xs text-slate-500 mt-1">PDF or TXT up to 10MB</p>
+                <p className="text-xs text-slate-500 mt-1">PDF, TXT, Excel (.xlsx/.xls), or CSV</p>
               </div>
 
               {files.length > 0 && (
@@ -126,7 +137,11 @@ export default function TrainingPage() {
                   <ul className="space-y-2">
                     {files.map((file, index) => (
                       <li key={index} className="text-sm text-slate-300 flex items-center gap-2">
-                        <FileText className="h-4 w-4 text-blue-400" />
+                        <FileText className={`h-4 w-4 ${
+                          file.name.endsWith('.xlsx') || file.name.endsWith('.xls') ? 'text-green-400' :
+                          file.name.endsWith('.csv') ? 'text-yellow-400' :
+                          file.name.endsWith('.pdf') ? 'text-red-400' : 'text-blue-400'
+                        }`} />
                         <span className="truncate">{file.name}</span>
                         <span className="text-slate-600 text-xs ml-auto">{(file.size / 1024).toFixed(1)} KB</span>
                       </li>

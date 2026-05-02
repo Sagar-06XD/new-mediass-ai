@@ -75,7 +75,7 @@ export default function Upload({ onUploadSuccess }) {
         <input 
           type="file" 
           multiple 
-          accept=".pdf,.txt,.md,.png,.jpg,.jpeg" 
+          accept=".pdf,.txt,.xlsx,.xls,.csv"
           className="hidden" 
           ref={fileInputRef}
           onChange={handleFileChange}
@@ -83,7 +83,7 @@ export default function Upload({ onUploadSuccess }) {
         <div className="flex flex-col items-center gap-3 text-gray-400">
           <UploadCloud size={40} className="text-gray-500" />
           <p><span className="text-brand-400 font-medium">Click to upload</span> or drag and drop</p>
-          <p className="text-xs">PDF, TXT, MD, PNG, JPG</p>
+          <p className="text-xs">PDF, TXT, Excel (.xlsx / .xls), CSV</p>
         </div>
       </div>
 
@@ -92,8 +92,13 @@ export default function Upload({ onUploadSuccess }) {
           {files.map((file, i) => (
             <div key={i} className="flex items-center justify-between bg-gray-900 px-3 py-2 rounded-lg border border-gray-800">
               <div className="flex items-center gap-2 text-sm truncate">
-                <FileIcon size={16} className="text-gray-400 flex-shrink-0" />
+                <FileIcon size={16} className={`flex-shrink-0 ${
+                  file.name.endsWith('.xlsx') || file.name.endsWith('.xls') ? 'text-green-400' :
+                  file.name.endsWith('.csv') ? 'text-yellow-400' :
+                  file.name.endsWith('.pdf') ? 'text-red-400' : 'text-gray-400'
+                }`} />
                 <span className="truncate">{file.name}</span>
+                <span className="text-xs text-gray-500 flex-shrink-0">{(file.size / 1024).toFixed(1)} KB</span>
               </div>
               <button onClick={() => removeFile(i)} className="text-gray-500 hover:text-red-400">
                 <X size={16} />

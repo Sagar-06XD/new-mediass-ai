@@ -21,7 +21,7 @@ export default function EmergencyAlert({ onDismiss }) {
 
       <div className="flex-1">
         <p className="font-bold text-sm">⚠️ Medical Emergency Detected</p>
-        <p className="text-xs text-red-200">Your symptoms may indicate a life-threatening condition. Seek immediate medical help.</p>
+        <p className="text-xs text-red-200">Your symptoms may indicate a life-threatening condition. Call 108 or seek immediate medical help.</p>
       </div>
 
       <motion.button
@@ -30,7 +30,7 @@ export default function EmergencyAlert({ onDismiss }) {
         className="flex items-center gap-2 bg-white text-red-600 font-bold text-sm px-4 py-2 rounded-xl flex-shrink-0 shadow-md"
       >
         <Phone size={14} />
-        Call Emergency
+        Call 108
       </motion.button>
 
       <button

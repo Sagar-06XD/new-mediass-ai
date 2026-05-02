@@ -1,6 +1,6 @@
 import React, { useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Brain, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Brain, CheckCircle2, AlertCircle, ShieldAlert } from 'lucide-react';
 import InputBox from './InputBox';
 import MessageBubble from './MessageBubble';
 import { Menu, PanelRight, Sun, Moon } from 'lucide-react';
@@ -17,7 +17,7 @@ function TypingIndicator({ darkMode }) {
           <div className={`w-1.5 h-1.5 rounded-full bg-blue-400 typing-dot`} />
           <div className={`w-1.5 h-1.5 rounded-full bg-blue-400 typing-dot`} />
           <div className={`w-1.5 h-1.5 rounded-full bg-blue-400 typing-dot`} />
-          <span className="text-xs text-blue-500 font-medium ml-2">Mediass AI is analyzing...</span>
+          <span className="text-xs text-blue-500 font-medium ml-2">MeAssist AI is analyzing...</span>
         </div>
       </div>
     </div>
@@ -82,8 +82,14 @@ export default function ChatWindow({
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto px-4 py-6 space-y-6">
+        <div className={`mx-auto max-w-3xl rounded-xl border px-4 py-3 flex gap-3 ${darkMode ? 'bg-amber-950/30 border-amber-800/50 text-amber-200' : 'bg-amber-50 border-amber-200 text-amber-800'}`}>
+          <ShieldAlert size={18} className="flex-shrink-0 mt-0.5" />
+          <p className="text-xs leading-relaxed">
+            MeAssist AI is an AI assistant, not a licensed doctor. It provides general information only and cannot diagnose, prescribe, or replace professional medical care. For emergencies, call 108 or seek immediate medical help.
+          </p>
+        </div>
         {messages.map((msg) => (
-          <MessageBubble key={msg.id} message={msg} darkMode={darkMode} />
+          <MessageBubble key={msg.id} message={msg} darkMode={darkMode} onSend={onSend} />
         ))}
         {isLoading && <TypingIndicator darkMode={darkMode} />}
         <div ref={bottomRef} />

@@ -1,31 +1,26 @@
 {
-  "name": "meassist-ai-backend",
+  "name": "meassist-ai-frontend",
+  "private": true,
   "version": "1.0.0",
-  "description": "Production ready backend for MeAssist AI",
-  "main": "server.js",
+  "type": "module",
   "scripts": {
-    "start": "node server.js",
-    "ingest": "node rag/ingest.js",
-    "seed-medical": "node scripts/seedMedicalBaseline.js --all-users"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
   },
   "dependencies": {
-    "@google/generative-ai": "^0.24.1",
-    "@langchain/community": "^0.2.0",
-    "@langchain/core": "^0.2.0",
-    "@langchain/google-genai": "^0.0.1",
     "axios": "^1.7.2",
-    "bcrypt": "^6.0.0",
-    "cors": "^2.8.5",
-    "dotenv": "^16.4.5",
-    "express": "^4.19.2",
-    "groq-sdk": "^1.1.2",
-    "hnswlib-node": "^3.0.0",
-    "jsonwebtoken": "^9.0.3",
-    "langchain": "^0.2.0",
-    "multer": "^1.4.5-lts.1",
-    "pdf-parse": "^1.1.1",
-    "sqlite3": "^6.0.1",
-    "uuid": "^10.0.0",
-    "xlsx": "^0.18.5"
+    "framer-motion": "^11.0.0",
+    "lucide-react": "^0.400.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.0.0",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.1",
+    "tailwindcss": "^4.0.0",
+    "vite": "^6.0.0"
   }
 }

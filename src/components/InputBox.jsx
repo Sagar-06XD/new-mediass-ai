@@ -30,7 +30,7 @@ export default function InputBox({ value, onChange, onSend, onFileUpload, isLoad
       <button
         onClick={() => fileInputRef.current?.click()}
         className={`p-2.5 rounded-xl ${btnHover} transition-colors flex-shrink-0`}
-        title="Attach file (PDF, TXT)"
+        title="Attach file (PDF, TXT, Excel, CSV)"
         disabled={isLoading}
       >
         <Paperclip size={18} />
@@ -38,7 +38,7 @@ export default function InputBox({ value, onChange, onSend, onFileUpload, isLoad
       <input
         ref={fileInputRef}
         type="file"
-        accept=".pdf,.txt"
+        accept=".pdf,.txt,.xlsx,.xls,.csv"
         onChange={handleFileChange}
         className="hidden"
       />

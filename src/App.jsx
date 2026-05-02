@@ -5,7 +5,24 @@ import ChatWindow from './components/ChatWindow';
 import InsightsPanel from './components/InsightsPanel';
 import EmergencyAlert from './components/EmergencyAlert';
 import TrainingPage from './components/TrainingPage';
-import { checkHealthAPI, queryModelAPI, resetChatSession, uploadFileAPI } from './services/api';
+import AuthPage from './components/AuthPage';
+import {
+  checkHealthAPI,
+  fetchTrainingStatusAPI,
+  queryModelAPI,
+  resetChatSession,
+  uploadFileAPI,
+  getChatSessionId,
+  setChatSessionId,
+} from './services/api';
+import {
+  loadConsultationStore,
+  saveConsultationStore,
+  upsertConsultationInStore,
+  reviveMessages,
+  summariesFromStore,
+  latestInsightsFromMessages,
+} from './utils/consultationStorage';
 
 // Mock structured AI responses
 const MOCK_RESPONSES = [
@@ -18,17 +35,25 @@ const MOCK_RESPONSES = [
     symptoms: ["Persistent headache", "Dizziness", "Neck stiffness"],
     confidence: 78,
     specialist: "Neurologist",
+    doctors: [
+      { name: "Dr. Sarah Chen", specialty: "Neurologist", rating: 4.8, distance: "0.5 km" },
+      { name: "Dr. James Wilson", specialty: "Neurologist", rating: 4.9, distance: "1.2 km" }
+    ],
     isEmergency: false,
   },
   {
     understanding: "You're describing severe chest pain radiating to your left arm with shortness of breath and sweating. This is a potentially life-threatening emergency that requires immediate attention.",
     causes: ["Myocardial infarction (heart attack)", "Unstable angina", "Pulmonary embolism", "Aortic dissection", "Severe anxiety/panic attack"],
     riskLevel: "high",
-    recommendations: ["CALL EMERGENCY SERVICES (911) IMMEDIATELY", "Chew an aspirin (325mg) if not allergic", "Sit or lie down in a comfortable position", "Loosen tight clothing", "Do NOT drive yourself to the hospital"],
+    recommendations: ["CALL EMERGENCY SERVICES (108) IMMEDIATELY", "Chew an aspirin (325mg) if not allergic", "Sit or lie down in a comfortable position", "Loosen tight clothing", "Do NOT drive yourself to the hospital"],
     doctorSuggestion: "Emergency Medicine / Cardiologist",
     symptoms: ["Severe chest pain", "Left arm radiation", "Shortness of breath", "Sweating"],
     confidence: 95,
     specialist: "Cardiologist",
+    doctors: [
+      { name: "Dr. Robert Vance", specialty: "Cardiologist", rating: 4.9, distance: "0.3 km" },
+      { name: "City Heart Center", specialty: "Emergency Cardiology", rating: 4.8, distance: "0.9 km" }
+    ],
     isEmergency: true,
   },
   {
@@ -44,16 +69,30 @@ const MOCK_RESPONSES = [
   }
 ];
 
+const DEFAULT_GREETING_TEXT =
+  "Hello! I'm MeAssist AI, an AI medical assistant. I can help organize symptoms and provide general health guidance, but I am not a real doctor and this is not a medical diagnosis.\n\nPlease describe what you're experiencing, and I'll provide structured health insights.";
+
+const makeDefaultGreeting = () => ({
+  id: Date.now(),
+  role: 'ai',
+  text: DEFAULT_GREETING_TEXT,
+  timestamp: new Date(),
+});
+
+const makeNewConsultGreeting = () => ({
+  id: Date.now(),
+  role: 'ai',
+  text: "Starting a new consultation. Please describe your symptoms or health concerns.",
+  timestamp: new Date(),
+});
+
 export default function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem('token'));
+  const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')) || null);
   const [darkMode, setDarkMode] = useState(false);
-  const [messages, setMessages] = useState([
-    {
-      id: 1,
-      role: 'ai',
-      text: "Hello! I'm **Mediass AI**, your intelligent medical assistant. I can help analyze your symptoms and provide structured health insights.\n\nPlease describe what you're experiencing, and I'll provide a detailed medical analysis.",
-      timestamp: new Date(),
-    }
-  ]);
+  const [consultationId, setConsultationId] = useState(null);
+  const [consultationSummaries, setConsultationSummaries] = useState([]);
+  const [messages, setMessages] = useState([makeDefaultGreeting()]);
   const [inputText, setInputText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [insights, setInsights] = useState(null);
@@ -64,23 +103,81 @@ export default function App() {
   const [mockIndex, setMockIndex] = useState(0);
   const [currentView, setCurrentView] = useState('chat');
 
-  // Check backend health + trained status
+  // Backend health + real training corpus / vector-store status (when logged in)
   useEffect(() => {
     const check = async () => {
       try {
         const res = await checkHealthAPI();
-        setIsTrained(Boolean(res.is_trained) || res.status === 'ok');
-      } catch {}
+        if (!isAuthenticated || !localStorage.getItem('token')) {
+          setIsTrained(Boolean(res.is_trained) || res.status === 'ok');
+          return;
+        }
+        try {
+          const st = await fetchTrainingStatusAPI();
+          setIsTrained(Boolean(st?.is_trained));
+        } catch {
+          setIsTrained(Boolean(res.is_trained) || res.status === 'ok');
+        }
+      } catch {
+        setIsTrained(false);
+      }
     };
     check();
     const interval = setInterval(check, 15000);
     return () => clearInterval(interval);
-  }, []);
+  }, [isAuthenticated]);
 
   // Dark mode class on body
   useEffect(() => {
     document.body.classList.toggle('dark', darkMode);
   }, [darkMode]);
+
+  /** Load or create persisted consultations for this user */
+  useEffect(() => {
+    const uid = user?.id;
+    if (!uid) return;
+
+    const store = loadConsultationStore(uid);
+    if (!store.orderedIds.length) {
+      const cid = crypto.randomUUID();
+      const msgs = [makeDefaultGreeting()];
+      upsertConsultationInStore(store, { id: cid, sessionId: getChatSessionId(), messages: msgs });
+      store.activeId = cid;
+      saveConsultationStore(uid, store);
+      setConsultationId(cid);
+      setMessages(msgs);
+      setConsultationSummaries(summariesFromStore(store));
+      return;
+    }
+
+    const active =
+      store.activeId && store.byId[store.activeId] ? store.activeId : store.orderedIds[0];
+    const entry = store.byId[active];
+    setChatSessionId(entry.sessionId);
+    setConsultationId(active);
+    const revived = reviveMessages(entry.messages);
+    setMessages(revived);
+    const ins = latestInsightsFromMessages(revived);
+    setInsights(ins);
+    setIsEmergency(Boolean(ins?.isEmergency));
+    setConsultationSummaries(summariesFromStore(store));
+  }, [user?.id]);
+
+  /** Keep localStorage and sidebar list in sync with the active consultation */
+  useEffect(() => {
+    const uid = user?.id;
+    if (!uid || !consultationId) return;
+
+    const store = loadConsultationStore(uid);
+    upsertConsultationInStore(store, {
+      id: consultationId,
+      sessionId: getChatSessionId(),
+      messages,
+    });
+    store.activeId = consultationId;
+    saveConsultationStore(uid, store);
+    setConsultationSummaries(summariesFromStore(store));
+  }, [messages, consultationId, user?.id]);
 
   const handleSend = async (text) => {
     const query = text || inputText;
@@ -95,58 +192,7 @@ export default function App() {
       try {
         let aiMsg;
 
-        if (isTrained) {
-          // ── Real backend path ──────────────────────────────────────────────
-          try {
-            const data = await queryModelAPI(query);
-            const intent = data.intent || 'medical';
-
-            if (intent === 'greeting' || intent === 'general' || intent === 'followup') {
-              // Plain chat bubble — no structured card, no insights update
-              aiMsg = {
-                id: Date.now() + 1,
-                role: 'ai',
-                text: data.text,
-                timestamp: new Date(),
-              };
-              // Do NOT update insights panel for non-medical replies
-            } else {
-              // Full medical structured response
-              const responseData = {
-                understanding: data.understanding || data.answer,
-                causes: data.causes || ["Based on your medical data"],
-                riskLevel: (data.risk || data.urgency || 'low').toLowerCase(),
-                recommendations: data.recommendations || ["Consult a specialist if symptoms persist"],
-                doctorSuggestion: data.doctor || 'General Physician',
-                confidence: Math.round((data.confidence || 0.85) * 100),
-                isEmergency: data.emergency || false,
-                sources: data.sources || [],
-                updated: data.updated || false,
-              };
-              aiMsg = {
-                id: Date.now() + 1,
-                role: 'ai',
-                structured: responseData,
-                timestamp: new Date(),
-              };
-              setInsights(responseData);
-              setIsEmergency(responseData.isEmergency);
-            }
-          } catch {
-            // Fall back to mock if API fails
-            const mockData = MOCK_RESPONSES[mockIndex % MOCK_RESPONSES.length];
-            setMockIndex(i => i + 1);
-            aiMsg = {
-              id: Date.now() + 1,
-              role: 'ai',
-              structured: mockData,
-              timestamp: new Date(),
-            };
-            setInsights(mockData);
-            setIsEmergency(mockData.isEmergency);
-          }
-        } else {
-          // ── Demo / mock path ───────────────────────────────────────────────
+        if (!user) {
           const mockData = MOCK_RESPONSES[mockIndex % MOCK_RESPONSES.length];
           setMockIndex(i => i + 1);
           aiMsg = {
@@ -157,6 +203,57 @@ export default function App() {
           };
           setInsights(mockData);
           setIsEmergency(mockData.isEmergency);
+        } else {
+          // ── Real backend path ──────────────────────────────────────────────
+          try {
+            const data = await queryModelAPI(query);
+            const intent = data.intent || 'medical';
+
+            if (intent === 'greeting' || intent === 'general' || intent === 'followup') {
+              aiMsg = {
+                id: Date.now() + 1,
+                role: 'ai',
+                text: data.text,
+                timestamp: new Date(),
+              };
+            } else {
+              const responseData = {
+                understanding: data.understanding || data.text || data.answer,
+                causes: data.causes || [],
+                riskLevel: (data.risk || data.urgency || 'low').toLowerCase(),
+                recommendations: data.recommendations || [],
+                specialist: data.doctor || 'General Physician',
+                doctors: data.doctors || [],
+                confidence: Math.round((data.confidence ?? (data.type === 'chat' ? 0.75 : 0.85)) * 100),
+                isEmergency: data.emergency || false,
+                sources: data.sources || [],
+                symptoms: data.symptoms || [],
+                updated: data.updated || false,
+              };
+              aiMsg = {
+                id: Date.now() + 1,
+                role: 'ai',
+                structured: responseData,
+                text: data.text,
+                timestamp: new Date(),
+              };
+              setInsights(responseData);
+              setIsEmergency(responseData.isEmergency);
+            }
+          } catch (error) {
+            console.error('Chat API Error:', error);
+            const status = error.response?.status;
+            const errorMsg = error.response?.data?.error || error.message;
+            
+            aiMsg = {
+              id: Date.now() + 1,
+              role: 'ai',
+              text: status === 401 
+                ? 'Your session has expired. Please log out and log back in.' 
+                : `Backend Error: ${errorMsg}. Please ensure the server is running on port 5001.`,
+              timestamp: new Date(),
+            };
+          }
         }
 
         setMessages(prev => [...prev, aiMsg]);
@@ -167,16 +264,71 @@ export default function App() {
   };
 
   const handleNewConsultation = () => {
-    resetChatSession();
-    setMessages([{
-      id: Date.now(),
-      role: 'ai',
-      text: "Starting a new consultation. Please describe your symptoms or health concerns.",
-      timestamp: new Date(),
-    }]);
+    const uid = user?.id;
+    if (uid && consultationId) {
+      const store = loadConsultationStore(uid);
+      upsertConsultationInStore(store, {
+        id: consultationId,
+        sessionId: getChatSessionId(),
+        messages,
+      });
+      const newSid = resetChatSession();
+      const nid = crypto.randomUUID();
+      const fresh = [makeNewConsultGreeting()];
+      upsertConsultationInStore(store, {
+        id: nid,
+        sessionId: newSid,
+        messages: fresh,
+      });
+      store.activeId = nid;
+      saveConsultationStore(uid, store);
+      setConsultationId(nid);
+      setMessages(fresh);
+      setConsultationSummaries(summariesFromStore(store));
+    } else {
+      resetChatSession();
+      setMessages([makeNewConsultGreeting()]);
+    }
     setInsights(null);
     setIsEmergency(false);
     setCurrentView('chat');
+  };
+
+  const handleSelectConsultation = (id) => {
+    const uid = user?.id;
+    if (!uid || id === consultationId) return;
+
+    const store = loadConsultationStore(uid);
+    const entry = store.byId[id];
+    if (!entry) return;
+
+    if (consultationId) {
+      upsertConsultationInStore(store, {
+        id: consultationId,
+        sessionId: getChatSessionId(),
+        messages,
+      });
+    }
+
+    setChatSessionId(entry.sessionId);
+    setConsultationId(id);
+    const revived = reviveMessages(entry.messages);
+    setMessages(revived);
+    const ins = latestInsightsFromMessages(revived);
+    setInsights(ins);
+    setIsEmergency(Boolean(ins?.isEmergency));
+    store.activeId = id;
+    saveConsultationStore(uid, store);
+    setConsultationSummaries(summariesFromStore(store));
+    setCurrentView('chat');
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    setIsAuthenticated(false);
+    setUser(null);
+    resetChatSession();
   };
 
   const handleFileUpload = async (file) => {
@@ -189,6 +341,13 @@ export default function App() {
       setMessages(prev => [...prev, sysMsg]);
     }
   };
+
+  if (!isAuthenticated) {
+    return <AuthPage onLogin={(userData) => {
+      setIsAuthenticated(true);
+      setUser(userData);
+    }} />;
+  }
 
   return (
     <div className={`h-screen flex flex-col overflow-hidden transition-colors duration-300 ${darkMode ? 'bg-slate-900 text-slate-100' : 'bg-gray-50 text-gray-900'}`}>
@@ -218,6 +377,11 @@ export default function App() {
                 isTrained={isTrained}
                 setCurrentView={setCurrentView}
                 currentView={currentView}
+                onLogout={handleLogout}
+                userEmail={user?.email}
+                consultations={consultationSummaries}
+                activeConsultationId={consultationId}
+                onSelectConsultation={handleSelectConsultation}
               />
             </motion.div>
           )}
