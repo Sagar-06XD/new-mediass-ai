@@ -5,6 +5,8 @@ const chatRoutes = require('./routes/chat');
 const abhaRoutes = require('./routes/abha');
 const doctorRoutes = require('./routes/doctor');
 const trainRoutes = require('./routes/train');
+const authRoutes = require('./routes/auth');
+const authMiddleware = require('./middleware/authMiddleware');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -13,15 +15,31 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
+// Request logger
+app.use((req, res, next) => {
+  console.log(`[${new Set().add(new Date().toISOString()).values().next().value}] ${req.method} ${req.url}`);
+  next();
+});
+
 // Routes
-app.use('/api/chat', chatRoutes);
-app.use('/api/abha', abhaRoutes);
-app.use('/api/doctor', doctorRoutes);
-app.use('/api/train', trainRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/chat', authMiddleware, chatRoutes);
+app.use('/api/abha', authMiddleware, abhaRoutes);
+app.use('/api/doctor', authMiddleware, doctorRoutes);
+app.use('/api/train', authMiddleware, trainRoutes);
 
 const path = require('path');
 
 // Health check endpoint
+app.get('/', (req, res) => {
+  res.json({
+    status: 'ok',
+    message: 'Doctor AI backend is running',
+    frontend: 'http://localhost:5176',
+    health: '/health',
+  });
+});
+
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', server: 'running' });
 });

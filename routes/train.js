@@ -1,6 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const { upload, uploadDocument, trainText } = require('../controllers/trainController');
+const { upload, uploadDocument, trainText, trainingStatus } = require('../controllers/trainController');
+
+// GET /api/train/status
+router.get('/status', trainingStatus);
 
 // POST /api/train/upload
 router.post('/upload', (req, res, next) => {

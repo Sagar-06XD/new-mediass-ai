@@ -1,26 +1,31 @@
 {
-  "name": "mediass-ai-backend",
+  "name": "meassist-ai-backend",
   "version": "1.0.0",
-  "description": "Production ready backend for Mediass AI",
+  "description": "Production ready backend for MeAssist AI",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "ingest": "node rag/ingest.js"
+    "ingest": "node rag/ingest.js",
+    "seed-medical": "node scripts/seedMedicalBaseline.js --all-users"
   },
   "dependencies": {
-    "express": "^4.19.2",
-    "cors": "^2.8.5",
-    "axios": "^1.7.2",
-    "dotenv": "^16.4.5",
     "@google/generative-ai": "^0.24.1",
-    "groq-sdk": "^1.1.2",
-    "langchain": "^0.2.0",
-    "@langchain/core": "^0.2.0",
     "@langchain/community": "^0.2.0",
+    "@langchain/core": "^0.2.0",
     "@langchain/google-genai": "^0.0.1",
+    "axios": "^1.7.2",
+    "bcrypt": "^6.0.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "groq-sdk": "^1.1.2",
     "hnswlib-node": "^3.0.0",
-    "pdf-parse": "^1.1.1",
+    "jsonwebtoken": "^9.0.3",
+    "langchain": "^0.2.0",
     "multer": "^1.4.5-lts.1",
-    "uuid": "^10.0.0"
+    "pdf-parse": "^1.1.1",
+    "sqlite3": "^6.0.1",
+    "uuid": "^10.0.0",
+    "xlsx": "^0.18.5"
   }
 }

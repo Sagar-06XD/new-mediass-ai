@@ -38,6 +38,29 @@ async function ingestDocuments() {
         console.log(`[Ingest] Loading Text: ${file}`);
         const loader = new TextLoader(filePath);
         docs = await loader.load();
+      } else if (file.endsWith('.xlsx') || file.endsWith('.xls') || file.endsWith('.csv')) {
+        console.log(`[Ingest] Loading Excel/CSV: ${file}`);
+        const XLSX = require('xlsx');
+        const workbook = XLSX.readFile(filePath);
+        const groupId = require('uuid').v4();
+        
+        workbook.SheetNames.forEach((sheetName) => {
+          const sheet = workbook.Sheets[sheetName];
+          const rows = XLSX.utils.sheet_to_json(sheet, { defval: '' });
+          rows.forEach((row, rowIndex) => {
+            const sentence = Object.entries(row)
+              .filter(([, val]) => String(val).trim() !== '')
+              .map(([col, val]) => `${col}: ${val}`)
+              .join(' | ');
+            
+            if (sentence.trim().length >= 10) {
+              docs.push({
+                pageContent: sentence,
+                metadata: { source: file, sheet: sheetName, row: rowIndex + 1, groupId }
+              });
+            }
+          });
+        });
       }
       
       allDocs.push(...docs);

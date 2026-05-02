@@ -3,9 +3,11 @@ const axios = require('axios');
 const getNearbyDoctors = async (specialist, location = "near me") => {
   try {
     const apiKey = process.env.GOOGLE_PLACES_API_KEY;
+    const useGooglePlaces = process.env.ENABLE_GOOGLE_PLACES === 'true';
     
-    // If no API key is provided, return mock data instantly
-    if (!apiKey || apiKey === 'your_google_places_key_here') {
+    // For demos/submission, return deterministic local suggestions instantly.
+    // Set ENABLE_GOOGLE_PLACES=true only when a valid key and network are available.
+    if (!useGooglePlaces || !apiKey || apiKey === 'your_google_places_key_here') {
       console.log('[DoctorService] No active Google Places API key found. Returning mock doctors.');
       return getMockDoctors(specialist);
     }
@@ -15,7 +17,7 @@ const getNearbyDoctors = async (specialist, location = "near me") => {
 
     console.log(`[DoctorService] Fetching doctors from Google Places API for query: ${specialist} ${location}`);
     
-    const response = await axios.get(url);
+    const response = await axios.get(url, { timeout: 1500 });
     const results = response.data.results;
 
     if (!results || results.length === 0) {
